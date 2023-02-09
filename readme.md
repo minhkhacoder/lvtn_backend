@@ -4,7 +4,8 @@ User
 
 - Login, Signup -> Complete
 - Update password -> Complete
-- Update info account -> Complete
+- Update info customer -> Complete
+- Create store seller -> Complete
 - Search product (key, category, brand, price, rating)
 - Get all products
 - Get detail product
@@ -12,7 +13,6 @@ User
 - Payment product (Stripe)
 - Rating product
 - Get all history trade
-- Create store seller
 - Create question
 
 Seller

@@ -41,7 +41,6 @@ class Accounts {
   // }
 
   updatePasswordAccount(acc_id, password_old, password_new) {
-    console.log(acc_id, password_old, password_new);
     const sql = "SELECT fn_update_password(?,?,?)";
     return new Promise((resolve, reject) => {
       db.query(sql, [acc_id, password_old, password_new], (err, result) => {

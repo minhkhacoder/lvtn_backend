@@ -15,9 +15,11 @@ app.use(cors());
 
 const authRoutes = require("./app/routes/auth");
 const customerRoutes = require("./app/routes/customer");
+const sellerRoutes = require("./app/routes/seller");
 
 app.use("/auth", authRoutes);
 app.use("/customer", customerRoutes);
+app.use("/seller", sellerRoutes);
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
