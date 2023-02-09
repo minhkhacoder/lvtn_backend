@@ -14,6 +14,7 @@ class Accounts {
     return new Promise((resolve, reject) => {
       db.query(sql, [username, phone, password], (err, result) => {
         if (err) return reject(err);
+
         resolve(result);
       });
     });
@@ -29,10 +30,21 @@ class Accounts {
     });
   }
 
-  findWithPassword(phone) {
-    const sql = "SELECT * FROM accounts WHERE acc_phone = ?";
+  // findWithPassword(phone) {
+  //   const sql = "SELECT * FROM accounts WHERE acc_phone = ?";
+  //   return new Promise((resolve, reject) => {
+  //     db.query(sql, [phone], (err, result) => {
+  //       if (err) return reject(err);
+  //       resolve(result);
+  //     });
+  //   });
+  // }
+
+  updatePasswordAccount(acc_id, password_old, password_new) {
+    console.log(acc_id, password_old, password_new);
+    const sql = "SELECT fn_update_password(?,?,?)";
     return new Promise((resolve, reject) => {
-      db.query(sql, [phone], (err, result) => {
+      db.query(sql, [acc_id, password_old, password_new], (err, result) => {
         if (err) return reject(err);
         resolve(result);
       });

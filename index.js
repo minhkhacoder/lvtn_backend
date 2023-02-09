@@ -14,8 +14,10 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const authRoutes = require("./app/routes/auth");
+const customerRoutes = require("./app/routes/customer");
 
-app.use("/", authRoutes);
+app.use("/auth", authRoutes);
+app.use("/customer", customerRoutes);
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);

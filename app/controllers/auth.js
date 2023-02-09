@@ -1,9 +1,9 @@
 /** @format */
 
-const Accounts = require("../models/Accounts");
+const Accounts = require("../models/accounts");
 const sha = require("sha1");
 const jwt = require("jsonwebtoken");
-const Customer = require("../models/Customer");
+const Customer = require("../models/customer");
 const { validateLogin, validateSignup } = require("../common/validators");
 
 const accounts = new Accounts();
@@ -58,6 +58,7 @@ const login = async (req, res) => {
 // Create a new account
 const signup = async (req, res) => {
   const { username, phone, password } = req.body;
+
   // Check validator
   const { message, isValid } = validateSignup(req.body);
   if (!isValid) {
@@ -72,17 +73,11 @@ const signup = async (req, res) => {
       message: "Account registered successfully!",
     });
   } catch (error) {
-    if (error.code === "ER_DUP_ENTRY") {
-      res.status(400).json({
-        success: false,
-        message: "Phone number already exists",
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        message: error.message,
-      });
-    }
+    res.status(500).json({
+      success: false,
+      message:
+        "Phone number already exists, please use a different phone number.",
+    });
   }
 };
 
@@ -113,8 +108,33 @@ const getAllAccounts = (req, res) => {
   }
 };
 
+const updatePasswordAccount = async (req, res) => {
+  const { acc_id, password_old, password_new } = req.body;
+
+  try {
+    const result = await accounts.updatePasswordAccount(
+      acc_id,
+      password_old,
+      password_new
+    );
+
+    let message = Object.values(result[0])[0];
+
+    res.status(201).json({
+      success: true,
+      message: message,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   login,
   signup,
   getAllAccounts,
+  updatePasswordAccount,
 };
