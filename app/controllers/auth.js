@@ -81,33 +81,6 @@ const signup = async (req, res) => {
   }
 };
 
-const getAllAccounts = (req, res) => {
-  try {
-    accounts
-      .getAllAccounts()
-      .then((results) => {
-        res.status(200).json({
-          success: true,
-          message: "Tất cả tài khoản được lấy thành công",
-          data: results,
-        });
-      })
-      .catch((err) => {
-        res.status(500).json({
-          success: false,
-          message: "Có lỗi xảy ra khi lấy tất cả tài khoản",
-          error: err,
-        });
-      });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Có lỗi xảy ra khi lấy tất cả tài khoản",
-      error: err,
-    });
-  }
-};
-
 const updatePasswordAccount = async (req, res) => {
   const { acc_id, password_old, password_new } = req.body;
 
@@ -135,6 +108,5 @@ const updatePasswordAccount = async (req, res) => {
 module.exports = {
   login,
   signup,
-  getAllAccounts,
   updatePasswordAccount,
 };

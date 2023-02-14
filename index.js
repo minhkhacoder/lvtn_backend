@@ -7,11 +7,9 @@ const bodyParser = require("body-parser");
 const app = express();
 require("dotenv").config();
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
-// parse application/json
-app.use(bodyParser.json());
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const authRoutes = require("./app/routes/auth");
 const customerRoutes = require("./app/routes/customer");
@@ -22,5 +20,5 @@ app.use("/customer", customerRoutes);
 app.use("/seller", sellerRoutes);
 
 app.listen(port, () => {
-  console.log(`App listening on port ${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });

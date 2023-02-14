@@ -19,6 +19,16 @@ class Customer {
     this.cus_address = cus_address;
   }
 
+  getInfoCustomerByAccId(acc_id) {
+    const sql = "SELECT * FROM customer WHERE acc_id = ?";
+    return new Promise((resolve, reject) => {
+      db.query(sql, [acc_id], (err, result) => {
+        if (err) reject(err);
+        resolve(result);
+      });
+    });
+  }
+
   updateCustomer(cus_id, cus_userName, cus_email, cus_gender, cus_address) {
     const sql = "SELECT fn_update_customer(?, ?, ?, ?, ?)";
     return new Promise((resolve, reject) => {

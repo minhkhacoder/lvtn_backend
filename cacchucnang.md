@@ -1,0 +1,29 @@
+<!-- @format -->
+
+- Đăng ký tài khoản
+- Đăng nhập tài khoản
+- Tìm kiếm sản phẩm
+- Xem chi tiết sản phẩm
+- Xem đánh giá
+- Xem khuyến mãi
+- Xem cửa hàng người bán
+- Quản lý tài khoản cá nhân
+- Tạo cửa hàng người bán
+- Quản lý giỏ hàng
+- Đặt câu hỏi
+- Đánh giá sản phẩm
+- Đặt hàng
+- Thanh toán
+- Xem lịch sử giao dịch
+- Quản lý thông tin cửa hàng
+- Quản lý câu hỏi khách hàng
+- Quản lý đánh giá
+- Quản lý sản phẩm
+- Quản lý chương trình khuyến mãi
+- Quản lý đơn hàng
+- Theo dõi doanh thu
+- Quản lý khách hàng
+- Quản lý cửa hàng người bán
+- Quản lý danh mục sản phẩm
+- Quản lý hình thức thanh toán
+- Quản lý đơn vị vận chuyển

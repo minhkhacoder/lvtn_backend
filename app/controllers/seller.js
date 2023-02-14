@@ -23,6 +23,27 @@ const createSeller = async (req, res) => {
   }
 };
 
+const updateSeller = async (req, res) => {
+  // const { name, image } = req.body;
+  console.log(req.body);
+  // try {
+  //   console.log(name);
+  //   console.log(image);
+  //   if (image !== undefined) {
+  //     res.status(201).json({
+  //       message: "Success",
+  //     });
+  //   } else {
+  //     res.status(400).json({
+  //       message: "Failed",
+  //     });
+  //   }
+  // } catch (error) {
+  //   console.log(error);
+  // }
+};
+
 module.exports = {
   createSeller,
+  updateSeller,
 };
