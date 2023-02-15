@@ -21,41 +21,84 @@ const drive = google.drive({
 oauth2Client.setCredentials({ refresh_token: GOOGLE_DRIVE_REFRESH_TOKEN });
 
 const uploadImage = async (image) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let fileName = image.name;
-      const fileMetadata = {
-        name: fileName,
-        mimeType: image.mimetype,
-        title: image.name,
-      };
-      const media = {
-        mimeType: image.mimetype,
-        body: fs.createReadStream(image.tempFilePath),
-      };
-      await drive.files
-        .create({
-          resource: fileMetadata,
-          media: media,
-          fields: "id",
-        })
-        .then((file) => {
-          if (!file || !file.data || !file.data.id) {
-            console.error("Error: Failed to upload file");
-            return;
-          }
-          console.log(`File ID: ${file.data.id}`);
-          resolve(file.data.id);
-        })
-        .catch((err) => {
-          console.error(`Error: ${err.message}`);
-        });
-    } catch (error) {
-      reject(error);
+  try {
+    let fileName = image.name;
+    const fileMetadata = {
+      name: fileName,
+      mimeType: image.mimetype,
+      title: image.name,
+    };
+    const media = {
+      mimeType: image.mimetype,
+      body: fs.createReadStream(image.tempFilePath),
+    };
+    const file = await drive.files.create({
+      resource: fileMetadata,
+      media: media,
+      fields: "id",
+    });
+    if (!file || !file.data || !file.data.id) {
+      throw new Error("Failed to upload file");
     }
-  });
+    return file.data.id;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+const getImageLink = async (fileId) => {
+  try {
+    const response = await drive.files.get({
+      fileId: fileId,
+      fields: "webViewLink",
+    });
+    return response.data.webViewLink;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+const updateImage = async (fileId, image) => {
+  try {
+    let fileName = image.name;
+    const fileMetadata = {
+      name: fileName,
+      mimeType: image.mimetype,
+      title: image.name,
+    };
+    const media = {
+      mimeType: image.mimetype,
+      body: fs.createReadStream(image.tempFilePath),
+    };
+    const file = await drive.files.update({
+      fileId: fileId,
+      resource: fileMetadata,
+      media: media,
+      fields: "id",
+    });
+    if (!file || !file.data || !file.data.id) {
+      throw new Error("Failed to update file");
+    }
+    return file.data.id;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+const deleteImage = async (fileId) => {
+  try {
+    await drive.files.delete({
+      fileId: fileId,
+    });
+    return true;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 module.exports = {
   uploadImage,
+  getImageLink,
+  updateImage,
+  deleteImage,
 };

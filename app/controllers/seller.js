@@ -1,49 +1,77 @@
 /** @format */
 
+const {
+  uploadImage,
+  getImageLink,
+  updateImage,
+} = require("../common/driveAPI");
 const Seller = require("../models/seller");
-
 const seller = new Seller();
 
-const createSeller = async (req, res) => {
-  const { acc_id, name, address } = req.body;
+exports.createSeller = async (req, res) => {
+  const data = req.body;
 
   try {
-    const result = await seller.createSeller(acc_id, name, address);
-
-    let message = Object.values(result[0])[0];
+    await seller.createSeller(data);
     res.status(201).json({
-      success: false,
-      message: message,
+      success: true,
+      message: "Store created successfully!",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Store name already exists, please choose a different name",
+      error: error.message,
     });
   }
 };
 
-const updateSeller = async (req, res) => {
-  // const { name, image } = req.body;
-  console.log(req.body);
-  // try {
-  //   console.log(name);
-  //   console.log(image);
-  //   if (image !== undefined) {
-  //     res.status(201).json({
-  //       message: "Success",
-  //     });
-  //   } else {
-  //     res.status(400).json({
-  //       message: "Failed",
-  //     });
-  //   }
-  // } catch (error) {
-  //   console.log(error);
-  // }
-};
+exports.updateSeller = async (req, res) => {
+  try {
+    const { id, desc } = req.body;
+    const avatar = req.files.avatar;
+    if (!req.files) {
+      return res.status(400).json({
+        success: false,
+        message: "No files were uploaded.",
+      });
+    }
+    const url = await seller.getLinkAvatar(id);
 
-module.exports = {
-  createSeller,
-  updateSeller,
+    if (url !== null) {
+      const fileOldId = url.slice(32, url.length - "/view?usp=drivesdk".length);
+
+      const fileId = await updateImage(fileOldId, avatar);
+      const linkAvatar = await getImageLink(fileId);
+
+      return res.status(201).json({
+        success: true,
+        message: "Update successfully!",
+        data: {
+          id: id,
+          description: desc,
+          avatar: linkAvatar,
+        },
+      });
+    }
+    const fileId = await uploadImage(avatar);
+    const linkAvatar = await getImageLink(fileId);
+
+    await seller.updateSeller(id, desc, linkAvatar);
+
+    res.status(201).json({
+      success: true,
+      message: "Update successfully!",
+      data: {
+        id: id,
+        description: desc,
+        avatar: linkAvatar,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
 };

@@ -20,12 +20,33 @@ class Seller extends Accounts {
     this.seller_avatar = seller_avatar;
   }
 
-  createSeller(acc_id, seller_name, seller_address) {
-    const sql = "SELECT fn_create_seller(?,?,?)";
+  createSeller(seller) {
+    const sql = "CALL sp_create_seller(?,?,?)";
     return new Promise((resolve, reject) => {
-      db.query(sql, [acc_id, seller_name, seller_address], (err, result) => {
+      db.query(sql, [seller.id, seller.name, seller.address], (err, result) => {
         if (err) reject(err);
         resolve(result);
+      });
+    });
+  }
+
+  updateSeller(id, desc, avatar) {
+    const sql =
+      "UPDATE seller SET seller_desc = ?, seller_avatar = ? WHERE seller_id = ?";
+    return new Promise((resolve, reject) => {
+      db.query(sql, [desc, avatar, id], (err, result) => {
+        if (err) reject(err);
+        resolve(result);
+      });
+    });
+  }
+
+  getLinkAvatar(id) {
+    const sql = "SELECT seller_avatar FROM seller WHERE seller_id = ?";
+    return new Promise((resolve, reject) => {
+      db.query(sql, [id], (err, result) => {
+        if (err) reject(err);
+        resolve(result[0].seller_avatar);
       });
     });
   }

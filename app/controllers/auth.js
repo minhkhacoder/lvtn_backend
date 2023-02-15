@@ -77,6 +77,7 @@ const signup = async (req, res) => {
       success: false,
       message:
         "Phone number already exists, please use a different phone number.",
+      error: error.message,
     });
   }
 };
