@@ -41,6 +41,16 @@ class Seller extends Accounts {
     });
   }
 
+  getInfoSeller(id) {
+    const sql = "SELECT * FROM seller WHERE acc_id = ?";
+    return new Promise((resolve, reject) => {
+      db.query(sql, [id], (err, result) => {
+        if (err) reject(err);
+        resolve(result);
+      });
+    });
+  }
+
   getLinkAvatar(id) {
     const sql = "SELECT seller_avatar FROM seller WHERE seller_id = ?";
     return new Promise((resolve, reject) => {

@@ -1,8 +1,9 @@
 /** @format */
 
 const db = require("../common/database");
+const Accounts = require("./accounts");
 
-class Customer {
+class Customer extends Accounts {
   constructor(
     cus_id,
     acc_id,
@@ -11,8 +12,8 @@ class Customer {
     cus_gender,
     cus_address
   ) {
+    super(acc_id);
     this.cus_id = cus_id;
-    this.acc_id = acc_id;
     this.cus_userName = cus_userName;
     this.cus_email = cus_email;
     this.cus_gender = cus_gender;

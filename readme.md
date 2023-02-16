@@ -17,7 +17,7 @@ User
 
 Seller
 
-- Add, update info store
+- Add, update info store -> Complete
 - Reply question customer
 - Reply rating
 - Get rating for point

@@ -6,9 +6,12 @@ const {
   updateImage,
 } = require("../common/driveAPI");
 const Seller = require("../models/seller");
+const sha = require("sha1");
+const jwt = require("jsonwebtoken");
+const { validateLogin } = require("../common/validators");
 const seller = new Seller();
 
-exports.createSeller = async (req, res) => {
+const createSeller = async (req, res) => {
   const data = req.body;
 
   try {
@@ -26,35 +29,74 @@ exports.createSeller = async (req, res) => {
   }
 };
 
-exports.updateSeller = async (req, res) => {
+const login = async (req, res) => {
+  const { phone, password, role } = req.body;
+
+  // Check validator
+  const { message, isValid } = validateLogin(req.body);
+  if (!isValid)
+    return res.status(400).json({ success: false, message: message });
+
   try {
-    const { id, desc } = req.body;
-    const avatar = req.files.avatar;
-    if (!req.files) {
+    const result = await seller.findWithPassword(phone);
+    if (!result.length || result[0].acc_password !== sha(password))
+      return res
+        .status(400)
+        .json({ success: false, message: "Phone or password incorrect!" });
+
+    if (result[0].acc_role !== role)
       return res.status(400).json({
         success: false,
-        message: "No files were uploaded.",
+        message: "Please, create account seller!",
+      });
+    // Generates a JWT token for the current account.
+    let token = `${jwt.sign(
+      { acc_id: result[0].acc_id, acc_role: result[0].acc_role },
+      process.env.ACCESS_TOKEN_SECRET
+    )}`;
+
+    let sellerInfo = await seller.getInfoSeller(result[0].acc_id);
+    console.log(sellerInfo);
+    return res.status(201).json({
+      success: true,
+      message: "Login successfully!",
+      token,
+      data: {
+        seller_id: sellerInfo[0].seller_id,
+        acc_id: sellerInfo[0].acc_id,
+        seller_name: sellerInfo[0].seller_name,
+        seller_desc: sellerInfo[0].seller_desc,
+        seller_address: sellerInfo[0].seller_address,
+        seller_avatar: sellerInfo[0].seller_avatar,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+const updateInfoSeller = async (req, res) => {
+  try {
+    if (!req.files || !req.files.avatar) {
+      return res.status(400).json({
+        success: false,
+        message: "No avatar file was uploaded.",
       });
     }
+    const { id, desc } = req.body;
+    const avatar = req.files.avatar;
+
     const url = await seller.getLinkAvatar(id);
+    const avatarId =
+      url &&
+      url.slice(32, url.length - process.env.DRIVE_SDK_URL_SUFFIX.length);
 
-    if (url !== null) {
-      const fileOldId = url.slice(32, url.length - "/view?usp=drivesdk".length);
-
-      const fileId = await updateImage(fileOldId, avatar);
-      const linkAvatar = await getImageLink(fileId);
-
-      return res.status(201).json({
-        success: true,
-        message: "Update successfully!",
-        data: {
-          id: id,
-          description: desc,
-          avatar: linkAvatar,
-        },
-      });
-    }
-    const fileId = await uploadImage(avatar);
+    const fileId = avatarId
+      ? await updateImage(avatarId, avatar)
+      : await uploadImage(avatar);
     const linkAvatar = await getImageLink(fileId);
 
     await seller.updateSeller(id, desc, linkAvatar);
@@ -63,7 +105,7 @@ exports.updateSeller = async (req, res) => {
       success: true,
       message: "Update successfully!",
       data: {
-        id: id,
+        id,
         description: desc,
         avatar: linkAvatar,
       },
@@ -74,4 +116,10 @@ exports.updateSeller = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+module.exports = {
+  createSeller,
+  login,
+  updateInfoSeller,
 };

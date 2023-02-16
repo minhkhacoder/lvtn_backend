@@ -2,9 +2,17 @@
 
 const express = require("express");
 const { verifyToken } = require("../authentication/auth");
-const { updateCustomer } = require("../controllers/customer");
+const {
+  login,
+  signup,
+  updatePasswordCustomer,
+  updateInfoCustomer,
+} = require("../controllers/customer");
 const router = express.Router();
 
-router.put("/update", verifyToken, updateCustomer);
+router.post("/login", login);
+router.post("/signup", signup);
+router.put("/update-password", verifyToken, updatePasswordCustomer);
+router.put("/update-info", verifyToken, updateInfoCustomer);
 
 module.exports = router;

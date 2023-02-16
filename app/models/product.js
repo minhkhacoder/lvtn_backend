@@ -1,0 +1,5 @@
+/** @format */
+
+class Product {
+  constructor() {}
+}

@@ -40,6 +40,16 @@ class Accounts {
     });
   }
 
+  // findRoleAccount(phone) {
+  //   const sql = "SELECT acc_role FROM accounts WHERE acc_phone = ?";
+  //   return new Promise((resolve, reject) => {
+  //     db.query(sql, [phone], (err, result) => {
+  //       if (err) return reject(err);
+  //       resolve(result[0].acc_role);
+  //     });
+  //   });
+  // }
+
   updatePasswordAccount(acc_id, password_old, password_new) {
     const sql = "SELECT fn_update_password(?,?,?)";
     return new Promise((resolve, reject) => {
