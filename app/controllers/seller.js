@@ -56,19 +56,11 @@ const login = async (req, res) => {
     )}`;
 
     let sellerInfo = await seller.getInfoSeller(result[0].acc_id);
-    console.log(sellerInfo);
     return res.status(201).json({
       success: true,
       message: "Login successfully!",
       token,
-      data: {
-        seller_id: sellerInfo[0].seller_id,
-        acc_id: sellerInfo[0].acc_id,
-        seller_name: sellerInfo[0].seller_name,
-        seller_desc: sellerInfo[0].seller_desc,
-        seller_address: sellerInfo[0].seller_address,
-        seller_avatar: sellerInfo[0].seller_avatar,
-      },
+      data: { ...sellerInfo[0] },
     });
   } catch (err) {
     res.status(500).json({

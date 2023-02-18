@@ -22,11 +22,14 @@ oauth2Client.setCredentials({ refresh_token: GOOGLE_DRIVE_REFRESH_TOKEN });
 
 const uploadImage = async (image) => {
   try {
-    let fileName = image.name;
+    let fileName = image.name
+      .toLowerCase()
+      .replace(/[^\w\s]/gi, "")
+      .replace(/\s+/g, "-");
     const fileMetadata = {
       name: fileName,
       mimeType: image.mimetype,
-      title: image.name,
+      title: fileName,
     };
     const media = {
       mimeType: image.mimetype,
@@ -60,11 +63,14 @@ const getImageLink = async (fileId) => {
 
 const updateImage = async (fileId, image) => {
   try {
-    let fileName = image.name;
+    let fileName = image.name
+      .toLowerCase()
+      .replace(/[^\w\s]/gi, "")
+      .replace(/\s+/g, "-");
     const fileMetadata = {
       name: fileName,
       mimeType: image.mimetype,
-      title: image.name,
+      title: fileName,
     };
     const media = {
       mimeType: image.mimetype,
@@ -96,9 +102,19 @@ const deleteImage = async (fileId) => {
   }
 };
 
+const uploadAndGetMultiImage = async (images) => {
+  const imagePromises = Object.values(images).map(async (image) => {
+    const fileId = await uploadImage(image);
+    const fileImage = fileId ? await getImageLink(fileId) : undefined;
+    return { name: image.name, url: fileImage };
+  });
+  return await Promise.all(imagePromises);
+};
+
 module.exports = {
   uploadImage,
   getImageLink,
   updateImage,
   deleteImage,
+  uploadAndGetMultiImage,
 };

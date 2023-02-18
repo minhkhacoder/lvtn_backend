@@ -10,6 +10,7 @@ dotenv.config();
 
 const customerRoutes = require("./app/routes/customer");
 const sellerRoutes = require("./app/routes/seller");
+const productRoutes = require("./app/routes/product");
 const app = express();
 
 app.use(cors());
@@ -25,6 +26,7 @@ app.use(
 
 app.use("/customer", customerRoutes);
 app.use("/seller", sellerRoutes);
+app.use("/seller/product", productRoutes);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
