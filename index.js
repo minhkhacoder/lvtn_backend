@@ -26,7 +26,7 @@ app.use(
 
 app.use("/customer", customerRoutes);
 app.use("/seller", sellerRoutes);
-app.use("/seller/product", productRoutes);
+app.use("/product", productRoutes);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

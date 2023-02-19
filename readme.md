@@ -21,8 +21,8 @@ Seller
 - Reply question customer
 - Reply rating
 - Get rating for point
-- CRUB product
-- CRUB sale
+- CRUD product -> Complete
+- CRUD sale
 - Get all order (order_id, cus_phone)
 - Update status order
 - Turn off/on shipping

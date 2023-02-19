@@ -91,7 +91,9 @@ const updateImage = async (fileId, image) => {
   }
 };
 
-const deleteImage = async (fileId) => {
+const deleteImageInDrive = async (url) => {
+  const fileId =
+    url && url.slice(32, url.length - process.env.DRIVE_SDK_URL_SUFFIX.length);
   try {
     await drive.files.delete({
       fileId: fileId,
@@ -115,6 +117,6 @@ module.exports = {
   uploadImage,
   getImageLink,
   updateImage,
-  deleteImage,
+  deleteImageInDrive,
   uploadAndGetMultiImage,
 };

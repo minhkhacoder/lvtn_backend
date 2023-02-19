@@ -22,6 +22,26 @@ class Images {
       );
     });
   }
+
+  getImagesByProductId(id) {
+    const sql = `SELECT * FROM images WHERE pro_id = ?`;
+    return new Promise((resolve, reject) => {
+      db.query(sql, [id], (err, result) => {
+        if (err) reject(err);
+        resolve(result);
+      });
+    });
+  }
+
+  deleteImage(image) {
+    const sql = "DELETE FROM images WHERE img_url = ?";
+    return new Promise((resolve, reject) => {
+      db.query(sql, [image.img_url], (err, result) => {
+        if (err) reject(err);
+        resolve(true);
+      });
+    });
+  }
 }
 
 module.exports = Images;
