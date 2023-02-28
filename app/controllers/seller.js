@@ -50,16 +50,24 @@ const login = async (req, res) => {
         message: "Please, create account seller!",
       });
     // Generates a JWT token for the current account.
-    let token = `${jwt.sign(
-      { acc_id: result[0].acc_id, acc_role: result[0].acc_role },
-      process.env.ACCESS_TOKEN_SECRET
+    let accessToken = `${jwt.sign(
+      { id: result[0].acc_id },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    )}`;
+
+    let refreshToken = `${jwt.sign(
+      { id: result[0].acc_id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "7d" }
     )}`;
 
     let sellerInfo = await seller.getInfoSeller(result[0].acc_id);
     return res.status(201).json({
       success: true,
       message: "Login successfully!",
-      token,
+      accessToken,
+      refreshToken,
       data: { ...sellerInfo[0] },
     });
   } catch (err) {

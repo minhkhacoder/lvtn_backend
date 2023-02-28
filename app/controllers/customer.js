@@ -23,9 +23,16 @@ const login = async (req, res) => {
         .json({ success: false, message: "Phone or password incorrect!" });
 
     // Generates a JWT token for the current account.
-    let token = `${jwt.sign(
-      { acc_id: result[0].acc_id, acc_role: result[0].acc_role },
-      process.env.ACCESS_TOKEN_SECRET
+    let accessToken = `${jwt.sign(
+      { id: result[0].acc_id },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    )}`;
+
+    let refreshToken = `${jwt.sign(
+      { id: result[0].acc_id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "7d" }
     )}`;
 
     let customerInfo = await customer.getInfoCustomerByAccId(result[0].acc_id);
@@ -33,7 +40,8 @@ const login = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Login successfully!",
-      token,
+      accessToken,
+      refreshToken,
       data: {
         cus_id: customerInfo[0].cus_id,
         acc_id: result[0].acc_id,

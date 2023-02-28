@@ -40,6 +40,14 @@ class Accounts {
     });
   }
 
+  findOne(id, callback) {
+    const sql = `SELECT * FROM accounts WHERE acc_id = ?`;
+    db.query(sql, [id], (err, result) => {
+      if (err) return callback(err);
+      callback(null, result[0]);
+    });
+  }
+
   // findRoleAccount(phone) {
   //   const sql = "SELECT acc_role FROM accounts WHERE acc_phone = ?";
   //   return new Promise((resolve, reject) => {
