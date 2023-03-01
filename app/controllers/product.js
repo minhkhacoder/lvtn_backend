@@ -6,10 +6,12 @@ const {
 } = require("../common/driveAPI");
 const Classify = require("../models/classify");
 const Images = require("../models/images");
+const Producer = require("../models/producer");
 const Product = require("../models/product");
 const products = new Product();
 const classifies = new Classify();
 const images = new Images();
+const producer = new Producer();
 
 const createProduct = async (req, res) => {
   try {
@@ -17,7 +19,7 @@ const createProduct = async (req, res) => {
       cat_id,
       bra_id,
       seller_id,
-      prod_id,
+      prod_name,
       pro_name,
       pro_desc,
       pro_material,
@@ -39,11 +41,14 @@ const createProduct = async (req, res) => {
       Array.isArray(pro_image) ? pro_image : [pro_image]
     );
 
+    await producer.createProducer(prod_name);
+    const producerId = await producer.findOneId(prod_name);
+
     const result = await products.createProduct({
       cat_id,
       bra_id,
       seller_id,
-      prod_id,
+      producerId,
       pro_name,
       pro_desc,
       pro_material,
