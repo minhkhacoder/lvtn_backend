@@ -4,14 +4,20 @@ const {
   uploadAndGetMultiImage,
   deleteImageInDrive,
 } = require("../common/driveAPI");
+const Brand = require("../models/brand");
+const Category = require("../models/category");
 const Classify = require("../models/classify");
 const Images = require("../models/images");
-const Producer = require("../models/producer");
 const Product = require("../models/product");
+const Seller = require("../models/seller");
+const Producer = require("../models/producer");
 const products = new Product();
 const classifies = new Classify();
 const images = new Images();
-const producer = new Producer();
+const categories = new Category();
+const brands = new Brand();
+const sellers = new Seller();
+const producers = new Producer();
 
 const createProduct = async (req, res) => {
   try {
@@ -19,7 +25,7 @@ const createProduct = async (req, res) => {
       cat_id,
       bra_id,
       seller_id,
-      prod_name,
+      prod_id,
       pro_name,
       pro_desc,
       pro_material,
@@ -40,15 +46,12 @@ const createProduct = async (req, res) => {
     const imageProduct = await uploadAndGetMultiImage(
       Array.isArray(pro_image) ? pro_image : [pro_image]
     );
-
-    await producer.createProducer(prod_name);
-    const producerId = await producer.findOneId(prod_name);
-
+    console.log(imageProduct);
     const result = await products.createProduct({
       cat_id,
       bra_id,
       seller_id,
-      producerId,
+      prod_id,
       pro_name,
       pro_desc,
       pro_material,
@@ -79,12 +82,13 @@ const createProduct = async (req, res) => {
       flad = await Promise.all(classifyPromises);
     }
 
-    const imagePromises = imageProduct.map((image) =>
-      images.addImage({
-        img_url: image.url,
-        pro_id: productId,
-        img_name: image.name,
-      })
+    const imagePromises = imageProduct.map(
+      async (image) =>
+        await images.addImage({
+          img_url: image.url,
+          pro_id: productId,
+          img_name: image.name,
+        })
     );
     flad = await Promise.all(imagePromises);
     flad
@@ -286,9 +290,58 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const getAllProducts = async (req, res) => {
+  try {
+    const results = await products.getAllProducts();
+
+    const data = await results.reduce(async (accPromise, cur) => {
+      let categoryPromise = categories.getCategoryById(cur.cat_id);
+      let brandPromise = brands.getBrandById(cur.bra_id);
+      let sellerPromise = sellers.getSellerById(cur.seller_id);
+      let producerPromise = producers.getProducerById(cur.prod_id);
+
+      let [category, brand, seller, producer] = await Promise.all([
+        categoryPromise,
+        brandPromise,
+        sellerPromise,
+        producerPromise,
+      ]);
+      // console.log(await getImageLink("10lnXBSiX10x0qzicgg5Y07fVLHd3Cz5f"));
+      let acc = await accPromise;
+      acc.push({
+        id: cur.pro_id,
+        name: cur.pro_name,
+        desc: cur.pro_desc,
+        material: cur.pro_material,
+        price: cur.pro_price,
+        category: category[0],
+        brand: brand[0],
+        producer: producer[0],
+        seller: seller[0],
+        rat_count: cur.rat_count,
+        average_rating: cur.average_rating,
+        image: cur.img_url,
+      });
+
+      return Promise.resolve(acc);
+    }, Promise.resolve([]));
+
+    res.status(200).json({
+      success: true,
+      data: data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProduct,
   getProductById,
   updateProduct,
   deleteProduct,
+  getAllProducts,
 };

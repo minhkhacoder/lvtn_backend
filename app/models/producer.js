@@ -37,6 +37,16 @@ class Producer {
       });
     });
   }
+
+  getProducerById(id) {
+    const sql = `SELECT * FROM producer WHERE prod_id = ?;`;
+    return new Promise((resolve, reject) => {
+      db.query(sql, [id], (err, results) => {
+        if (err) reject(err);
+        resolve(results);
+      });
+    });
+  }
 }
 
 module.exports = Producer;

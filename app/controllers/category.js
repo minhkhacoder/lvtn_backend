@@ -10,10 +10,18 @@ const getAllCategory = async (req, res) => {
     const categoryParent = results.filter((cat) => cat.cat_parent === null);
 
     const data = categoryParent.map((cate) => ({
-      cat_id: cate.cat_id,
-      cat_name: cate.cat_name,
-      cat_parent: cate.cat_parent,
-      childrens: results.filter((child) => child.cat_parent === cate.cat_id),
+      id: cate.cat_id,
+      label: cate.cat_name,
+      parent: cate.cat_parent,
+      childrens: results
+        .filter((child) => child.cat_parent === cate.cat_id)
+        .map((item) => {
+          return {
+            id: item.cat_id,
+            label: item.cat_name,
+            parent: item.cat_parent,
+          };
+        }),
     }));
 
     res.status(201).json({

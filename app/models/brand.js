@@ -27,6 +27,16 @@ class Brand {
       });
     });
   }
+
+  getBrandById(id) {
+    const sql = `SELECT * FROM brand WHERE bra_id = ?;`;
+    return new Promise((resolve, reject) => {
+      db.query(sql, [id], (err, results) => {
+        if (err) reject(err);
+        resolve(results);
+      });
+    });
+  }
 }
 
 module.exports = Brand;

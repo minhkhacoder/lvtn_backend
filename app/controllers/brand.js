@@ -7,10 +7,13 @@ const brand = new Brand();
 const getAllBrand = async (req, res) => {
   try {
     const results = await brand.getAllBrand();
+    const data = results.map((item) => {
+      return { id: item.bra_id, label: item.bra_name };
+    });
     if (results?.length > 0) {
       res.status(201).json({
         success: true,
-        data: results,
+        data: data,
       });
     } else {
       res.status(201).json({

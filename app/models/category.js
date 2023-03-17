@@ -17,6 +17,16 @@ class Category {
       });
     });
   }
+
+  getCategoryById(id) {
+    const sql = `SELECT * FROM category WHERE cat_id = ?;`;
+    return new Promise((resolve, reject) => {
+      db.query(sql, [id], (err, results) => {
+        if (err) reject(err);
+        resolve(results);
+      });
+    });
+  }
 }
 
 module.exports = Category;
