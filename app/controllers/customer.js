@@ -15,8 +15,9 @@ const login = async (req, res) => {
   if (!isValid)
     return res.status(400).json({ success: false, message: message });
 
+  const formatPhone = phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
   try {
-    const result = await customer.findWithPassword(phone);
+    const result = await customer.findWithPassword(formatPhone);
     if (!result.length || result[0].acc_password !== sha(password))
       return res
         .status(400)
@@ -37,7 +38,7 @@ const login = async (req, res) => {
 
     let customerInfo = await customer.getInfoCustomerByAccId(result[0].acc_id);
 
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
       message: "Login successfully!",
       accessToken,
@@ -50,6 +51,7 @@ const login = async (req, res) => {
         cus_email: customerInfo[0].cus_email,
         cus_gender: customerInfo[0].cus_gender,
         cus_address: customerInfo[0].cus_address,
+        cus_avatar: customerInfo[0].cus_avatar,
       },
     });
   } catch (err) {
@@ -63,7 +65,7 @@ const login = async (req, res) => {
 // Create a new account
 const signup = async (req, res) => {
   const { username, phone, password } = req.body;
-
+  const formatPhone = phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
   // Check validator
   const { message, isValid } = validateSignup(req.body);
   if (!isValid) {
@@ -71,8 +73,8 @@ const signup = async (req, res) => {
   }
 
   try {
-    await customer.createAccount(username, phone, password);
-    res.status(201).json({
+    await customer.createAccount(username, formatPhone, password);
+    res.status(200).json({
       success: true,
       message: "Account registered successfully!",
     });

@@ -10,7 +10,8 @@ class Customer extends Accounts {
     cus_userName,
     cus_email,
     cus_gender,
-    cus_address
+    cus_address,
+    cus_avatar
   ) {
     super(acc_id);
     this.cus_id = cus_id;
@@ -18,6 +19,7 @@ class Customer extends Accounts {
     this.cus_email = cus_email;
     this.cus_gender = cus_gender;
     this.cus_address = cus_address;
+    this.cus_avatar = cus_avatar;
   }
 
   getInfoCustomerByAccId(acc_id) {

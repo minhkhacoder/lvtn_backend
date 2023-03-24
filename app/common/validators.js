@@ -14,7 +14,17 @@ exports.validateSignup = (data) => {
 
   // Validates the phone number
   const locale = ["vi-VN", "en-US", "zh-CN"];
-  if (!locale.some((loc) => validator.isMobilePhone(phone, loc))) {
+  if (
+    !locale.some((loc) => {
+      if (loc === "en-US") {
+        return validator.isMobilePhone(
+          phone.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3"),
+          loc
+        );
+      }
+      return validator.isMobilePhone(phone, loc);
+    })
+  ) {
     message = "Invalid phone number";
   }
 
@@ -40,7 +50,11 @@ exports.validateLogin = (data) => {
 
   // Validates the phone number
   const locale = ["vi-VN", "en-US", "zh-CN"];
-  if (!locale.some((loc) => validator.isMobilePhone(phone, loc))) {
+  if (
+    !locale.some((loc) =>
+      validator.isMobilePhone(phone.replace(/\D/g, ""), loc)
+    )
+  ) {
     message = "Invalid phone number";
   }
 
