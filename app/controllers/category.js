@@ -36,6 +36,23 @@ const getAllCategory = async (req, res) => {
   }
 };
 
+const getCategoryByParentId = async (req, res) => {
+  try {
+    const { parentId } = req.query;
+    const results = await category.getCategoryByParentId(parentId);
+    res.status(200).json({
+      success: true,
+      data: results,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAllCategory,
+  getCategoryByParentId,
 };

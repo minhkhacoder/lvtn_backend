@@ -9,7 +9,9 @@ const Seller = require("../models/seller");
 const sha = require("sha1");
 const jwt = require("jsonwebtoken");
 const { validateLogin } = require("../common/validators");
+const Accounts = require("../models/accounts");
 const seller = new Seller();
+const account = new Accounts();
 
 const createSeller = async (req, res) => {
   const data = req.body;
@@ -38,7 +40,8 @@ const login = async (req, res) => {
     return res.status(400).json({ success: false, message: message });
 
   try {
-    const result = await seller.findWithPassword(phone);
+    const result = await account.findWithPassword(phone);
+    console.log(result[0]);
     if (!result.length || result[0].acc_password !== sha(password))
       return res
         .status(400)

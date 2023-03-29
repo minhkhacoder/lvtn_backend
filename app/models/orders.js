@@ -8,6 +8,7 @@ class Orders {
     acc_id,
     ship_id,
     pay_id,
+    or_address,
     or_status,
     or_createdAt,
     or_updatedAt
@@ -16,15 +17,16 @@ class Orders {
     this.acc_id = acc_id;
     this.ship_id = ship_id;
     this.pay_id = pay_id;
+    this.or_address = or_address;
     this.or_status = or_status;
     this.or_createdAt = or_createdAt;
     this.or_updatedAt = or_updatedAt;
   }
 
-  createOrder(acc_id, ship_id, pay_id, or_createdAt) {
+  createOrder(acc_id, ship_id, pay_id, or_address, or_createdAt) {
     const sql =
-      "INSERT INTO orders (acc_id, ship_id, pay_id, or_createdAt) VALUES (?, ?, ?, ?)";
-    const values = [acc_id, ship_id, pay_id, or_createdAt];
+      "INSERT INTO orders (acc_id, ship_id, pay_id,or_address,  or_createdAt) VALUES (?, ?, ?, ?, ?)";
+    const values = [acc_id, ship_id, pay_id, or_address, or_createdAt];
     return new Promise((resolve, reject) => {
       db.execute(sql, values, (err, result) => {
         if (err) return reject(err);

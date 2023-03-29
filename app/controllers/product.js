@@ -308,6 +308,12 @@ const getAllProducts = async (req, res) => {
       ]);
       // console.log(await getImageLink("10lnXBSiX10x0qzicgg5Y07fVLHd3Cz5f"));
       let acc = await accPromise;
+      let averageRating;
+      if (cur.average_rating === null) {
+        averageRating = 0;
+      } else {
+        averageRating = cur.average_rating;
+      }
       acc.push({
         id: cur.pro_id,
         name: cur.pro_name,
@@ -319,7 +325,7 @@ const getAllProducts = async (req, res) => {
         producer: producer[0],
         seller: seller[0],
         rat_count: cur.rat_count,
-        average_rating: cur.average_rating,
+        average_rating: parseInt(averageRating),
         image: cur.img_url,
       });
 

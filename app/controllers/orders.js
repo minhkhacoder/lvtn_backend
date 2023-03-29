@@ -6,7 +6,7 @@ const orders = new Orders();
 const orderDetail = new OrderDetail();
 
 const createOrder = async (req, res) => {
-  const { acc_id, ship_id, pay_id, order_detail } = req.body;
+  const { acc_id, ship_id, pay_id, or_address, order_detail } = req.body;
   const now = new Date(); // Lấy thời gian hiện tại
   const formattedDate =
     now.getFullYear() +
@@ -25,6 +25,7 @@ const createOrder = async (req, res) => {
       acc_id,
       ship_id,
       pay_id,
+      or_address,
       formattedDate
     );
 
