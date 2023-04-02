@@ -11,7 +11,7 @@ const getAllBrand = async (req, res) => {
       return { id: item.bra_id, label: item.bra_name };
     });
     if (results?.length > 0) {
-      res.status(201).json({
+      res.status(200).json({
         success: true,
         data: data,
       });

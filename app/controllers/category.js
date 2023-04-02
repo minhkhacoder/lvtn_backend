@@ -24,7 +24,7 @@ const getAllCategory = async (req, res) => {
         }),
     }));
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       data: data,
     });
@@ -40,9 +40,12 @@ const getCategoryByParentId = async (req, res) => {
   try {
     const { parentId } = req.query;
     const results = await category.getCategoryByParentId(parentId);
+    const data = results.map((item) => {
+      return { id: item.cat_id, label: item.cat_name, parent: item.cat_parent };
+    });
     res.status(200).json({
       success: true,
-      data: results,
+      data: data,
     });
   } catch (error) {
     res.status(500).json({
