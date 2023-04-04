@@ -17,7 +17,10 @@ const login = async (req, res) => {
 
   const formatPhone = phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
   try {
-    const result = await customer.findWithPassword(formatPhone);
+    const result = await customer.vertifyAccountCustomer(
+      formatPhone,
+      sha(password)
+    );
     if (!result.length || result[0].acc_password !== sha(password))
       return res
         .status(400)

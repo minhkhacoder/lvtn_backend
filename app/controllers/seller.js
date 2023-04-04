@@ -34,14 +34,19 @@ const createSeller = async (req, res) => {
 const login = async (req, res) => {
   const { phone, password, role } = req.body;
 
+  const formatPhone = phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
+
   // Check validator
   const { message, isValid } = validateLogin(req.body);
   if (!isValid)
     return res.status(400).json({ success: false, message: message });
 
   try {
-    const result = await account.findWithPassword(phone);
-    console.log(result[0]);
+    const result = await account.vertifyAccountSeller(
+      formatPhone,
+      sha(password),
+      role
+    );
     if (!result.length || result[0].acc_password !== sha(password))
       return res
         .status(400)
@@ -93,9 +98,10 @@ const updateInfoSeller = async (req, res) => {
     const avatar = req.files.avatar;
 
     const url = await seller.getLinkAvatar(id);
+    console.log(url);
+    // https://drive.google.com/uc?export=view&id=10lnXBSiX10x0qzicgg5Y07fVLHd3Cz5f
     const avatarId =
-      url &&
-      url.slice(32, url.length - process.env.DRIVE_SDK_URL_SUFFIX.length);
+      url && url.slice(url.length - process.env.DRIVE_VIEW.length);
 
     const fileId = avatarId
       ? await updateImage(avatarId, avatar)

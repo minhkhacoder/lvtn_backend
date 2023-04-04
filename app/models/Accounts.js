@@ -30,11 +30,25 @@ class Accounts {
     });
   }
 
-  findWithPassword(phone) {
-    const sql = "SELECT * FROM accounts WHERE acc_phone = ?";
+  vertifyAccountCustomer(phone, password) {
+    const sql =
+      "SELECT * FROM accounts WHERE acc_phone = ? AND acc_password = ?";
     return new Promise((resolve, reject) => {
-      db.query(sql, [phone], (err, result) => {
+      db.query(sql, [phone, password], (err, result) => {
         if (err) return reject(err);
+
+        resolve(result);
+      });
+    });
+  }
+
+  vertifyAccountSeller(phone, password, role) {
+    const sql =
+      "SELECT * FROM accounts WHERE acc_phone = ? AND acc_password = ? AND acc_role = ?";
+    return new Promise((resolve, reject) => {
+      db.query(sql, [phone, password, role], (err, result) => {
+        if (err) return reject(err);
+
         resolve(result);
       });
     });
