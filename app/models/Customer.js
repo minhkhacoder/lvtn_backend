@@ -32,17 +32,48 @@ class Customer extends Accounts {
     });
   }
 
-  updateCustomer(cus_id, cus_userName, cus_email, cus_gender, cus_address) {
-    const sql = "SELECT fn_update_customer(?, ?, ?, ?, ?)";
+  updateCustomer(
+    cus_id,
+    cus_userName,
+    cus_email,
+    cus_gender,
+    cus_address,
+    cus_avatar
+  ) {
+    let sql = `
+      UPDATE customer
+      SET 
+        cus_userName = ?,
+        cus_email = ?,
+        cus_gender = ?,
+        cus_address = ?`;
+
+    const params = [cus_userName, cus_email, cus_gender, cus_address];
+
+    if (cus_avatar) {
+      sql += ", cus_avatar = ?";
+      params.push(cus_avatar);
+    }
+
+    sql += " WHERE cus_id = ?";
+
+    params.push(cus_id);
+
     return new Promise((resolve, reject) => {
-      db.query(
-        sql,
-        [cus_id, cus_userName, cus_email, cus_gender, cus_address],
-        (err, result) => {
-          if (err) reject(err);
-          resolve(result);
-        }
-      );
+      db.query(sql, params, (err, result) => {
+        if (err) reject(err);
+        resolve(true);
+      });
+    });
+  }
+
+  getLinkAvatarCustomer(id) {
+    const sql = "SELECT cus_avatar FROM customer WHERE cus_id = ?";
+    return new Promise((resolve, reject) => {
+      db.query(sql, [id], (err, result) => {
+        if (err) reject(err);
+        resolve(result[0].cus_avatar);
+      });
     });
   }
 }

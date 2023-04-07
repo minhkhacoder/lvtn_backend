@@ -98,10 +98,11 @@ const updateInfoSeller = async (req, res) => {
     const avatar = req.files.avatar;
 
     const url = await seller.getLinkAvatar(id);
-    console.log(url);
-    // https://drive.google.com/uc?export=view&id=10lnXBSiX10x0qzicgg5Y07fVLHd3Cz5f
-    const avatarId =
-      url && url.slice(url.length - process.env.DRIVE_VIEW.length);
+
+    const viewIdLength = process.env.DRIVE_VIEW.length;
+    const viewIdIndex = url.lastIndexOf(process.env.DRIVE_VIEW);
+
+    const avatarId = url.slice(viewIdIndex + viewIdLength);
 
     const fileId = avatarId
       ? await updateImage(avatarId, avatar)

@@ -4,6 +4,11 @@ const { validateLogin, validateSignup } = require("../common/validators");
 const Customer = require("../models/customer");
 const sha = require("sha1");
 const jwt = require("jsonwebtoken");
+const {
+  updateImage,
+  uploadImage,
+  getImageLink,
+} = require("../common/driveAPI");
 
 const customer = new Customer();
 
@@ -94,20 +99,52 @@ const signup = async (req, res) => {
 const updateInfoCustomer = async (req, res) => {
   const { id, username, email, gender, address } = req.body;
   try {
-    const result = await customer.updateCustomer(
-      id,
-      username,
-      email,
-      gender,
-      address
-    );
+    const { avatar } = req.files ?? {};
+    console.log(avatar);
+    let linkAvatar = "";
+    if (avatar) {
+      const url = await customer.getLinkAvatarCustomer(id);
+      const viewIdLength = process.env.DRIVE_VIEW.length;
+      let viewIdIndex = url && url.lastIndexOf(process.env.DRIVE_VIEW);
 
-    let message = Object.values(result[0])[0];
-
-    res.status(201).json({
-      success: true,
-      message: message,
-    });
+      const avatarId = url && url.slice(viewIdIndex + viewIdLength);
+      console.log(avatarId);
+      const fileId = avatarId
+        ? await updateImage(avatarId, avatar)
+        : await uploadImage(avatar);
+      linkAvatar = getImageLink(fileId);
+    }
+    let result;
+    if (linkAvatar != "") {
+      result = await customer.updateCustomer(
+        id,
+        username,
+        email,
+        gender,
+        address,
+        linkAvatar
+      );
+    } else {
+      result = await customer.updateCustomer(
+        id,
+        username,
+        email,
+        gender,
+        address
+      );
+    }
+    if (result) {
+      res.status(200).json({
+        success: true,
+        message: "Updated successfully!",
+        avatar: linkAvatar,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Failed to update",
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
