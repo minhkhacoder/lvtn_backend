@@ -21,6 +21,16 @@ class OrderDetail {
       });
     });
   }
+
+  getAllOrderDetailById(id) {
+    const sql = `SELECT * FROM orderdetail WHERE or_id = ?;`;
+    return new Promise((resolve, reject) => {
+      db.query(sql, [id], (err, results) => {
+        if (err) reject(err);
+        resolve(results);
+      });
+    });
+  }
 }
 
 module.exports = OrderDetail;

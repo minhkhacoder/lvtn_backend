@@ -67,6 +67,23 @@ class Customer extends Accounts {
     });
   }
 
+  updateAddressCustomer(cus_id, cus_address) {
+    let sql = `
+      UPDATE customer
+      SET 
+        cus_address = ?
+      WHERE cus_id = ?`;
+
+    const params = [cus_address, cus_id];
+
+    return new Promise((resolve, reject) => {
+      db.query(sql, params, (err, result) => {
+        if (err) reject(err);
+        resolve(true);
+      });
+    });
+  }
+
   getLinkAvatarCustomer(id) {
     const sql = "SELECT cus_avatar FROM customer WHERE cus_id = ?";
     return new Promise((resolve, reject) => {

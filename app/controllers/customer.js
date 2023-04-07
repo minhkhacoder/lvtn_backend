@@ -100,7 +100,6 @@ const updateInfoCustomer = async (req, res) => {
   const { id, username, email, gender, address } = req.body;
   try {
     const { avatar } = req.files ?? {};
-    console.log(avatar);
     let linkAvatar = "";
     if (avatar) {
       const url = await customer.getLinkAvatarCustomer(id);
@@ -108,7 +107,7 @@ const updateInfoCustomer = async (req, res) => {
       let viewIdIndex = url && url.lastIndexOf(process.env.DRIVE_VIEW);
 
       const avatarId = url && url.slice(viewIdIndex + viewIdLength);
-      console.log(avatarId);
+
       const fileId = avatarId
         ? await updateImage(avatarId, avatar)
         : await uploadImage(avatar);
@@ -153,6 +152,29 @@ const updateInfoCustomer = async (req, res) => {
   }
 };
 
+const updateAddressCustomer = async (req, res) => {
+  const { id, address } = req.body;
+  try {
+    const result = await customer.updateAddressCustomer(id, address);
+    if (result) {
+      res.status(200).json({
+        success: true,
+        message: "Updated successfully!",
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Failed to update",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const updatePasswordCustomer = async (req, res) => {
   const { acc_id, password_old, password_new } = req.body;
 
@@ -182,4 +204,5 @@ module.exports = {
   login,
   updateInfoCustomer,
   updatePasswordCustomer,
+  updateAddressCustomer,
 };

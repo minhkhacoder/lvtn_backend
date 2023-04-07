@@ -43,6 +43,25 @@ class Orders {
       });
     });
   }
+
+  getOrderByAccountId(id) {
+    const sql = `
+    SELECT o.or_id, o.acc_id, ship.ship_fee AS ship, pay.pay_name AS payment, 
+    o.or_address, o.or_status, ordt.pro_id, ordt.ordt_id ,ordt.ordt_quantity AS quantity, ordt.ordt_price AS total_price,
+    img.img_url
+    FROM orders o
+    JOIN payment pay ON o.pay_id = pay.pay_id
+    JOIN shipping ship ON o.ship_id = ship.ship_id
+    JOIN orderdetail ordt ON o.or_id = ordt.or_id
+    JOIN images img ON ordt.pro_id=img.pro_id 
+    WHERE o.acc_id = ?;`;
+    return new Promise((resolve, reject) => {
+      db.query(sql, [id], (err, results) => {
+        if (err) reject(err);
+        resolve(results);
+      });
+    });
+  }
 }
 
 module.exports = Orders;

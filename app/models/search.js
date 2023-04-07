@@ -73,12 +73,11 @@ class Search {
     JOIN images img ON p.pro_id=img.pro_id 
     LEFT JOIN rating r ON p.pro_id = r.pro_id
     JOIN category c ON p.cat_id = c.cat_id 
-    WHERE LOWER(p.pro_name) LIKE '%${key}%'
-    OR LOWER(c.cat_name) LIKE '%${key}%'
-    GROUP BY p.pro_id, img_url;
-    `;
+    WHERE MATCH(p.pro_name, p.pro_desc) AGAINST(? IN NATURAL LANGUAGE MODE)
+    OR MATCH(c.cat_name) AGAINST(? IN NATURAL LANGUAGE MODE)
+    GROUP BY p.pro_id, img_url;`;
     return new Promise((resolve, reject) => {
-      db.query(sql, (err, results) => {
+      db.query(sql, [key, key], (err, results) => {
         if (err) reject(err);
         resolve(results);
       });
