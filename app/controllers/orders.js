@@ -1,11 +1,13 @@
 /** @format */
 
 const Orders = require("../models/orders");
+const Seller = require("../models/seller");
 const OrderDetail = require("../models/order_detail");
 const Product = require("../models/product");
 const orders = new Orders();
 const orderDetail = new OrderDetail();
 const product = new Product();
+const sellers = new Seller();
 
 const createOrder = async (req, res) => {
   const { acc_id, ship_id, pay_id, or_address, order_detail } = req.body;
@@ -71,17 +73,20 @@ const getAllOrderByAccountId = async (req, res) => {
         const [products] = await Promise.all([
           product.getProductById(cur.pro_id),
         ]);
-
+        const [seller] = await Promise.all([
+          sellers.getSellerById(products.seller_id),
+        ]);
+        console.log(seller[0].seller_name);
+        console.log("+++++++++++++++");
         const detail = {
           ordt_id: cur.ordt_id,
           quantity: cur.quantity,
-          total: parseFloat(cur.total_price) + parseFloat(cur.ship),
+          total: parseFloat(cur.total_price),
           products: {
-            products: {
-              ...products,
-              pro_price: parseFloat(products.pro_price),
-            },
+            ...products,
+            pro_price: parseFloat(products.pro_price),
             image: cur.img_url,
+            seller: seller[0],
           },
         };
         if (!detailsMap[cur.ordt_id]) {
@@ -94,6 +99,7 @@ const getAllOrderByAccountId = async (req, res) => {
               payment: cur.payment,
               address: cur.or_address,
               status: cur.or_status,
+              createdAt: cur.or_createdAt,
               details: [],
             };
           }
