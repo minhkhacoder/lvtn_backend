@@ -23,7 +23,7 @@ class Producer {
     return new Promise((resolve, reject) => {
       db.query(sql, [name], (err, results) => {
         if (err) reject(err);
-        resolve(results);
+        resolve(name);
       });
     });
   }
@@ -34,6 +34,18 @@ class Producer {
       db.query(sql, [name], (err, results) => {
         if (err) reject(err);
         resolve(results[0].prod_id);
+      });
+    });
+  }
+
+  findOneProducerByName(name) {
+    const sql = `SELECT prod_id FROM producer WHERE prod_name = ?`;
+    return new Promise((resolve, reject) => {
+      db.query(sql, [name], (err, results) => {
+        if (err) reject(err);
+        if (results.length > 0) {
+          resolve(results[0].prod_id);
+        } else resolve(false);
       });
     });
   }

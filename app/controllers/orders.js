@@ -35,12 +35,11 @@ const createOrder = async (req, res) => {
 
     for (let i = 0; i < order_detail.length; i++) {
       const { pro_id, ordt_quantity, ordt_price } = order_detail[i];
-      let price = ordt_price * ordt_quantity;
       let isCreateOrder = await orderDetail.createOrderDetail(
         orderId,
         pro_id,
         ordt_quantity,
-        price
+        ordt_price
       );
       if (isCreateOrder === false)
         return res.status(400).json({
@@ -76,8 +75,6 @@ const getAllOrderByAccountId = async (req, res) => {
         const [seller] = await Promise.all([
           sellers.getSellerById(products.seller_id),
         ]);
-        console.log(seller[0].seller_name);
-        console.log("+++++++++++++++");
         const detail = {
           ordt_id: cur.ordt_id,
           quantity: cur.quantity,

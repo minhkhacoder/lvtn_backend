@@ -25,7 +25,7 @@ const createProduct = async (req, res) => {
       cat_id,
       bra_id,
       seller_id,
-      prod_id,
+      prod_name,
       pro_name,
       pro_desc,
       pro_material,
@@ -46,21 +46,33 @@ const createProduct = async (req, res) => {
     const imageProduct = await uploadAndGetMultiImage(
       Array.isArray(pro_image) ? pro_image : [pro_image]
     );
-    console.log(imageProduct);
-    const result = await products.createProduct({
-      cat_id,
-      bra_id,
-      seller_id,
-      prod_id,
-      pro_name,
-      pro_desc,
-      pro_material,
-      pro_price: Number(pro_price),
-      pro_quantity: Number(pro_quantity),
-    });
 
-    if (!result) {
-      throw new Error("Created product failed!");
+    const resultProducer = await producers.findOneProducerByName(prod_name);
+
+    let producerId = "";
+    if (resultProducer === false) {
+      const producer = await producers.createProducer(prod_name);
+      if (producer === prod_name) {
+        producerId = await producers.findOneId(producer);
+      }
+    } else producerId = resultProducer;
+
+    if (producerId !== "") {
+      const result = await products.createProduct({
+        cat_id,
+        bra_id,
+        seller_id,
+        producerId,
+        pro_name,
+        pro_desc,
+        pro_material,
+        pro_price: Number(pro_price),
+        pro_quantity: Number(pro_quantity),
+      });
+
+      if (!result) {
+        throw new Error("Created product failed!");
+      }
     }
 
     let flad = false;
@@ -342,10 +354,64 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getAllProductsBySellerId = async (req, res) => {
+  try {
+    const { sellerId } = req.query;
+    const results = await products.getAllProductsBySellerId(sellerId);
+
+    const data = await results.reduce(async (accPromise, cur) => {
+      let categoryPromise = categories.getCategoryById(cur.cat_id);
+      let brandPromise = brands.getBrandById(cur.bra_id);
+      let sellerPromise = sellers.getSellerById(cur.seller_id);
+      let producerPromise = producers.getProducerById(cur.prod_id);
+
+      let [category, brand, seller, producer] = await Promise.all([
+        categoryPromise,
+        brandPromise,
+        sellerPromise,
+        producerPromise,
+      ]);
+      let acc = await accPromise;
+      let averageRating;
+      if (cur.average_rating === null) {
+        averageRating = 0;
+      } else {
+        averageRating = cur.average_rating;
+      }
+      acc.push({
+        id: cur.pro_id,
+        name: cur.pro_name,
+        desc: cur.pro_desc,
+        material: cur.pro_material,
+        price: cur.pro_price,
+        category: category[0],
+        brand: brand[0],
+        producer: producer[0],
+        seller: seller[0],
+        rat_count: cur.rat_count,
+        average_rating: parseInt(averageRating),
+        image: cur.img_url,
+      });
+      return Promise.resolve(acc);
+    }, Promise.resolve([]));
+
+    res.status(200).json({
+      success: true,
+      data: data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProduct,
   getProductById,
   updateProduct,
   deleteProduct,
   getAllProducts,
+  getAllProductsBySellerId,
 };
