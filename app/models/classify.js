@@ -34,7 +34,7 @@ class Classify {
     });
   }
 
-  updateClassify(id, classify) {
+  updateClassify(classify) {
     const sql = `UPDATE classify SET
     pro_id = ?,
     cla_group = ?,

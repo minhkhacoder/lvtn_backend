@@ -149,7 +149,7 @@ const updateProduct = async (req, res) => {
       cat_id,
       bra_id,
       seller_id,
-      prod_id,
+      prod_name,
       pro_name,
       pro_desc,
       pro_material,
@@ -158,7 +158,9 @@ const updateProduct = async (req, res) => {
       cla_group,
       cla_name,
     } = req.body;
-    const { pro_image } = req.files;
+    const pro_image = req.files?.pro_image;
+
+    const producerId = await producers.findOneId(prod_name);
 
     const existingProduct = await products.getProductById(id);
 
@@ -173,7 +175,7 @@ const updateProduct = async (req, res) => {
       cat_id: cat_id || existingProduct.cat_id,
       bra_id: bra_id || existingProduct.bra_id,
       seller_id: seller_id || existingProduct.seller_id,
-      prod_id: prod_id || existingProduct.prod_id,
+      prod_id: producerId || existingProduct.prod_id,
       pro_name: pro_name || existingProduct.pro_name,
       pro_desc: pro_desc || existingProduct.pro_desc,
       pro_material: pro_material || existingProduct.pro_material,
@@ -354,11 +356,13 @@ const getAllProducts = async (req, res) => {
   }
 };
 
-const getAllProductsBySellerId = async (req, res) => {
+const getAllProductsPaginationBySellerId = async (req, res) => {
   try {
-    const { sellerId } = req.query;
-    const results = await products.getAllProductsBySellerId(sellerId);
+    const { page, limit, sellerId } = req.query;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
 
+    const results = await products.getAllProductsBySellerId(sellerId);
     const data = await results.reduce(async (accPromise, cur) => {
       let categoryPromise = categories.getCategoryById(cur.cat_id);
       let brandPromise = brands.getBrandById(cur.bra_id);
@@ -395,6 +399,66 @@ const getAllProductsBySellerId = async (req, res) => {
       return Promise.resolve(acc);
     }, Promise.resolve([]));
 
+    const paginatedData = data.slice(startIndex, endIndex);
+
+    res.status(200).json({
+      success: true,
+      total: results.length,
+      data: paginatedData,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getProductSellerById = async (req, res) => {
+  try {
+    const { proId } = req.query;
+    const results = await products.getProductsSellerById(proId);
+
+    const data = await results.reduce(async (accPromise, cur) => {
+      let categoryPromise = categories.getCategoryById(cur.cat_id);
+      let brandPromise = brands.getBrandById(cur.bra_id);
+      let sellerPromise = sellers.getSellerById(cur.seller_id);
+      let clasifyPromise = classifies.getClasifyById(cur.pro_id);
+      let producerPromise = producers.getProducerById(cur.prod_id);
+
+      let [category, brand, seller, clasify, producer] = await Promise.all([
+        categoryPromise,
+        brandPromise,
+        sellerPromise,
+        clasifyPromise,
+        producerPromise,
+      ]);
+      let acc = await accPromise;
+      let averageRating;
+      if (cur.average_rating === null) {
+        averageRating = 0;
+      } else {
+        averageRating = cur.average_rating;
+      }
+      acc.push({
+        id: cur.pro_id,
+        name: cur.pro_name,
+        desc: cur.pro_desc,
+        material: cur.pro_material,
+        price: cur.pro_price,
+        quantity: cur.pro_quantity,
+        category: category[0],
+        brand: brand[0],
+        producer: producer[0],
+        seller: seller[0],
+        classify: clasify,
+        rat_count: cur.rat_count,
+        average_rating: parseInt(averageRating),
+        image: cur.img_url,
+      });
+      return Promise.resolve(acc);
+    }, Promise.resolve([]));
+
     res.status(200).json({
       success: true,
       data: data,
@@ -413,5 +477,6 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getAllProducts,
-  getAllProductsBySellerId,
+  getAllProductsPaginationBySellerId,
+  getProductSellerById,
 };

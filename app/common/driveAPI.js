@@ -100,7 +100,7 @@ const updateImage = async (fileId, image) => {
 };
 
 const deleteImageInDrive = async (url) => {
-  const fileId = url.split("=")[1];
+  const fileId = url.split("=")[2];
   try {
     await drive.files.delete({
       fileId: fileId,
@@ -113,9 +113,11 @@ const deleteImageInDrive = async (url) => {
 
 const uploadAndGetMultiImage = async (images) => {
   const imagePromises = Object.values(images).map(async (image) => {
-    const fileId = await uploadImage(image);
-    const fileImage = fileId ? getImageLink(fileId) : undefined;
-    return { name: image.name, url: fileImage };
+    if (typeof image !== "string") {
+      const fileId = await uploadImage(image);
+      const fileImage = fileId ? getImageLink(fileId) : undefined;
+      return { name: image.name, url: fileImage };
+    }
   });
   return await Promise.all(imagePromises);
 };

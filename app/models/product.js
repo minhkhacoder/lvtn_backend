@@ -179,6 +179,32 @@ class Product {
       });
     });
   }
+
+  getProductsSellerById(id) {
+    const sql = `SELECT p.pro_id, p.cat_id, p.bra_id, p.seller_id, p.prod_id , p.pro_name, p.pro_desc, p.pro_material, p.pro_price, p.pro_quantity,
+    COUNT(r.rat_id) AS rat_count, AVG(r.rat_point) AS average_rating, img.img_url
+    FROM product p
+    JOIN images img ON p.pro_id=img.pro_id 
+    LEFT JOIN rating r ON p.pro_id = r.pro_id
+    WHERE p.pro_id = ?
+    GROUP BY p.pro_id, img_url;`;
+    return new Promise((resolve, reject) => {
+      db.query(sql, [id], (err, results) => {
+        if (err) reject(err);
+        const productMap = new Map();
+        for (const product of results) {
+          if (productMap.has(product.pro_id)) {
+            const existingProduct = productMap.get(product.pro_id);
+            existingProduct.img_url.push(product.img_url);
+          } else {
+            const newProduct = { ...product, img_url: [product.img_url] };
+            productMap.set(product.pro_id, newProduct);
+          }
+        }
+        resolve(Array.from(productMap.values()));
+      });
+    });
+  }
 }
 
 module.exports = Product;

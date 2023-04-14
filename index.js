@@ -18,6 +18,7 @@ const shipRoutes = require("./app/routes/shipping");
 const paymentRoutes = require("./app/routes/payment");
 const searchRoutes = require("./app/routes/search");
 const ratingRoutes = require("./app/routes/rating");
+const imageRoutes = require("./app/routes/images");
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use("/shipping", shipRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/search", searchRoutes);
 app.use("/rating", ratingRoutes);
+app.use("/images", imageRoutes);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
