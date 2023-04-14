@@ -22,10 +22,12 @@ class Customer extends Accounts {
     this.cus_avatar = cus_avatar;
   }
 
-  getInfoCustomerByAccId(acc_id) {
-    const sql = "SELECT * FROM customer WHERE acc_id = ?";
+  getInfoCustomerByAccId(id) {
+    const sql = `SELECT cus.cus_id, cus.acc_id, cus.cus_userName, cus.cus_email, cus.cus_gender, cus.cus_address, cus.cus_avatar, acc.acc_phone FROM customer cus
+    JOIN accounts acc ON cus.acc_id = acc.acc_id
+    WHERE cus.acc_id = ?`;
     return new Promise((resolve, reject) => {
-      db.query(sql, [acc_id], (err, result) => {
+      db.query(sql, [id], (err, result) => {
         if (err) reject(err);
         resolve(result);
       });
