@@ -352,6 +352,85 @@ const updateStatusOrder = async (req, res) => {
   }
 };
 
+const getAllOrderStatusBySellerId = async (req, res) => {
+  try {
+    const { sellerId } = req.query;
+
+    const result = await orders.getOrderBySellerId(sellerId);
+
+    const ordersMap = {};
+
+    await Promise.all(
+      result.map(async (cur) => {
+        if (!ordersMap[cur.or_id]) {
+          ordersMap[cur.or_id] = {
+            or_id: cur.or_id,
+            ship: cur.ship,
+            payment: cur.payment,
+            address: cur.or_address,
+            status: cur.or_status,
+            createdAt: cur.or_createdAt,
+          };
+        }
+      })
+    );
+    const currentResult = Object.values(ordersMap);
+    let data = new Array(7);
+    let status1 = 0;
+    let status2 = 0;
+    let status3 = 0;
+    let status4 = 0;
+    let status5 = 0;
+    let status6 = 0;
+    let status7 = 0;
+
+    for (let index = 0; index < currentResult.length; index++) {
+      switch (currentResult[index].status) {
+        case 0:
+          status1++;
+          data[0] = { id: 0, name: "Pending", count: status1 };
+          break;
+        case 1:
+          status2++;
+          data[1] = { id: 1, name: "Confirmed", count: status2 };
+          break;
+        case 2:
+          status3++;
+          data[2] = { id: 2, name: "Shipping", count: status3 };
+          break;
+        case 3:
+          status4++;
+          data[3] = { id: 3, name: "Delivered", count: status4 };
+          break;
+        case 4:
+          data[4] = { id: 4, name: "Completed", count: status5 };
+          status5++;
+          break;
+        case 5:
+          status6++;
+          data[5] = { id: 5, name: "Cancelled", count: status6 };
+          break;
+        case 6:
+          status7++;
+          data[6] = { id: 6, name: "Return", count: status7 };
+          break;
+        default:
+          break;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createOrder,
   getAllOrderByAccountId,
@@ -359,4 +438,5 @@ module.exports = {
   getOrderDetailById,
   updateStatusOrder,
   getOrderFilter,
+  getAllOrderStatusBySellerId,
 };
