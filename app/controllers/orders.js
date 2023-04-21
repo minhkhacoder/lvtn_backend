@@ -181,10 +181,82 @@ const getAllOrderBySellerId = async (req, res) => {
   }
 };
 
-const getAllOrderById = async (req, res) => {
+const getOrderFilter = async (req, res) => {
+  try {
+    const { id, phone, status, pay, dateStart, dateEnd, page, limit } =
+      req.query;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const formatPhone =
+      phone && phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
+    const result = await orders.getOrderFilter(
+      id,
+      formatPhone,
+      status,
+      pay,
+      dateStart,
+      dateEnd
+    );
+
+    const detailsMap = {};
+    const ordersMap = {};
+
+    await Promise.all(
+      result.map(async (cur) => {
+        const [products] = await Promise.all([
+          product.getProductById(cur.pro_id),
+        ]);
+        const [seller, customer] = await Promise.all([
+          sellers.getSellerById(products.seller_id),
+          customers.getInfoCustomerByAccId(cur.acc_id),
+        ]);
+        const detail = {
+          ordt_id: cur.ordt_id,
+          quantity: cur.quantity,
+          total: parseFloat(cur.total_price),
+          products: {
+            ...products,
+            pro_price: parseFloat(products.pro_price),
+            image: cur.img_url,
+            seller: seller[0],
+          },
+        };
+        if (!detailsMap[cur.ordt_id]) {
+          detailsMap[cur.ordt_id] = detail;
+          if (!ordersMap[cur.or_id]) {
+            ordersMap[cur.or_id] = {
+              or_id: cur.or_id,
+              customer: customer[0],
+              ship: cur.ship,
+              payment: cur.payment,
+              address: cur.or_address,
+              status: cur.or_status,
+              createdAt: cur.or_createdAt,
+              details: [],
+            };
+          }
+          ordersMap[cur.or_id].details.push(detail);
+        }
+      })
+    );
+    const currentResult = Object.values(ordersMap).slice(startIndex, endIndex);
+    res.status(200).json({
+      success: true,
+      total: Object.values(ordersMap).length,
+      data: currentResult,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getOrderDetailById = async (req, res) => {
   try {
     const { orderId } = req.query;
-    const result = await orders.getOrderById(orderId);
+    const result = await orders.getOrderDetailById(orderId);
 
     const detailsMap = {};
     const ordersMap = {};
@@ -284,6 +356,7 @@ module.exports = {
   createOrder,
   getAllOrderByAccountId,
   getAllOrderBySellerId,
-  getAllOrderById,
+  getOrderDetailById,
   updateStatusOrder,
+  getOrderFilter,
 };

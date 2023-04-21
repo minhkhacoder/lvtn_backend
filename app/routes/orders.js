@@ -7,14 +7,16 @@ const {
   createOrder,
   getAllOrderByAccountId,
   getAllOrderBySellerId,
-  getAllOrderById,
   updateStatusOrder,
+  getOrderDetailById,
+  getOrderFilter,
 } = require("../controllers/orders");
 
 router.post("/create", verifyToken, createOrder);
 router.get("/all", verifyToken, getAllOrderByAccountId);
 router.get("/seller/all", verifyToken, getAllOrderBySellerId);
-router.get("/seller/detail", verifyToken, getAllOrderById);
+router.get("/seller/filter", verifyToken, getOrderFilter);
+router.get("/seller/detail", verifyToken, getOrderDetailById);
 router.put("/seller/update-status", verifyToken, updateStatusOrder);
 
 module.exports = router;
