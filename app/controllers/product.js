@@ -25,7 +25,7 @@ const createProduct = async (req, res) => {
       cat_id,
       bra_id,
       seller_id,
-      prod_name,
+      prod_id,
       pro_name,
       pro_desc,
       pro_material,
@@ -47,32 +47,20 @@ const createProduct = async (req, res) => {
       Array.isArray(pro_image) ? pro_image : [pro_image]
     );
 
-    const resultProducer = await producers.findOneProducerByName(prod_name);
+    const result = await products.createProduct({
+      cat_id,
+      bra_id,
+      seller_id,
+      prod_id,
+      pro_name,
+      pro_desc,
+      pro_material,
+      pro_price: Number(pro_price),
+      pro_quantity: Number(pro_quantity),
+    });
 
-    let producerId = "";
-    if (resultProducer === false) {
-      const producer = await producers.createProducer(prod_name);
-      if (producer === prod_name) {
-        producerId = await producers.findOneId(producer);
-      }
-    } else producerId = resultProducer;
-
-    if (producerId !== "") {
-      const result = await products.createProduct({
-        cat_id,
-        bra_id,
-        seller_id,
-        producerId,
-        pro_name,
-        pro_desc,
-        pro_material,
-        pro_price: Number(pro_price),
-        pro_quantity: Number(pro_quantity),
-      });
-
-      if (!result) {
-        throw new Error("Created product failed!");
-      }
+    if (!result) {
+      throw new Error("Created product failed!");
     }
 
     let flad = false;
@@ -149,7 +137,7 @@ const updateProduct = async (req, res) => {
       cat_id,
       bra_id,
       seller_id,
-      prod_name,
+      prod_id,
       pro_name,
       pro_desc,
       pro_material,
@@ -159,8 +147,6 @@ const updateProduct = async (req, res) => {
       cla_name,
     } = req.body;
     const pro_image = req.files?.pro_image;
-
-    const producerId = await producers.findOneId(prod_name);
 
     const existingProduct = await products.getProductById(id);
 
@@ -175,7 +161,7 @@ const updateProduct = async (req, res) => {
       cat_id: cat_id || existingProduct.cat_id,
       bra_id: bra_id || existingProduct.bra_id,
       seller_id: seller_id || existingProduct.seller_id,
-      prod_id: producerId || existingProduct.prod_id,
+      prod_id: prod_id || existingProduct.prod_id,
       pro_name: pro_name || existingProduct.pro_name,
       pro_desc: pro_desc || existingProduct.pro_desc,
       pro_material: pro_material || existingProduct.pro_material,
@@ -191,8 +177,7 @@ const updateProduct = async (req, res) => {
 
     let flag = false;
     const classifyArr = await classifies.getClasifyById(id);
-
-    if (classifyArr && cla_group && cla_name) {
+    if (classifyArr.length > 0 && cla_group && cla_name) {
       let groupArr = Array.isArray(cla_group) ? cla_group : [cla_group];
       let nameArr = Array.isArray(cla_name) ? cla_name : [cla_name];
 
@@ -206,21 +191,19 @@ const updateProduct = async (req, res) => {
         return classifies.updateClassify(classify);
       });
       flag = await Promise.all(classifyPromises);
-    }
+    } else {
+      let groupArr = Array.isArray(cla_group) ? cla_group : [cla_group];
+      let nameArr = Array.isArray(cla_name) ? cla_name : [cla_name];
 
-    if (pro_image) {
-      const imageProduct = await uploadAndGetMultiImage(
-        Array.isArray(pro_image) ? pro_image : [pro_image]
-      );
-
-      const imagePromises = imageProduct.map((image) =>
-        images.addImage({
-          img_url: image.url,
+      const classifyPromises = groupArr.map((group, i) => {
+        const classify = {
           pro_id: id,
-          img_name: image.name,
-        })
-      );
-      flag = await Promise.all(imagePromises);
+          cla_group: group,
+          cla_name: nameArr[i],
+        };
+        return classifies.createClassify(classify);
+      });
+      flag = await Promise.all(classifyPromises);
     }
 
     flag

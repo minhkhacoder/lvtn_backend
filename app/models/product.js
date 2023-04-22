@@ -49,7 +49,7 @@ class Product {
           product.cat_id,
           product.bra_id,
           product.seller_id,
-          product.producerId,
+          product.prod_id,
           product.pro_name,
           product.pro_desc,
           product.pro_material,
@@ -135,7 +135,8 @@ class Product {
     FROM product p
     JOIN images img ON p.pro_id=img.pro_id 
     LEFT JOIN rating r ON p.pro_id = r.pro_id
-    GROUP BY p.pro_id, img_url;`;
+    GROUP BY p.pro_id, img_url
+    ;`;
     return new Promise((resolve, reject) => {
       db.query(sql, [], (err, results) => {
         if (err) reject(err);
@@ -161,7 +162,10 @@ class Product {
     JOIN images img ON p.pro_id=img.pro_id 
     LEFT JOIN rating r ON p.pro_id = r.pro_id
     WHERE p.seller_id = ?
-    GROUP BY p.pro_id, img_url;`;
+    GROUP BY p.pro_id, img_url
+    ORDER BY 
+    p.pro_id DESC
+    ;`;
     return new Promise((resolve, reject) => {
       db.query(sql, [id], (err, results) => {
         if (err) reject(err);

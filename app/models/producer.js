@@ -8,15 +8,15 @@ class Producer {
     this.prod_name = prod_name;
   }
 
-  // getAllBrand() {
-  //   const sql = `SELECT * FROM brand`;
-  //   return new Promise((resolve, reject) => {
-  //     db.query(sql, (err, results) => {
-  //       if (err) reject(err);
-  //       resolve(results);
-  //     });
-  //   });
-  // }
+  getAllProducer() {
+    const sql = `SELECT * FROM producer`;
+    return new Promise((resolve, reject) => {
+      db.query(sql, (err, results) => {
+        if (err) reject(err);
+        resolve(results);
+      });
+    });
+  }
 
   createProducer(name) {
     const sql = `INSERT INTO producer(prod_name) VALUES(?)`;

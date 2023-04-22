@@ -418,6 +418,34 @@ const getAllOrderStatusBySellerId = async (req, res) => {
           break;
       }
     }
+    data[0] =
+      status1 === 0
+        ? { id: 0, name: "Pending", count: status1 }
+        : { ...data[0] };
+    data[1] =
+      status2 === 0
+        ? { id: 0, name: "Confirmed", count: status2 }
+        : { ...data[1] };
+    data[2] =
+      status3 === 0
+        ? { id: 0, name: "Shipping", count: status3 }
+        : { ...data[2] };
+    data[3] =
+      status4 === 0
+        ? { id: 0, name: "Delivered", count: status4 }
+        : { ...data[3] };
+    data[4] =
+      status5 === 0
+        ? { id: 0, name: "Completed", count: status5 }
+        : { ...data[4] };
+    data[5] =
+      status6 === 0
+        ? { id: 0, name: "Cancelled", count: status6 }
+        : { ...data[5] };
+    data[6] =
+      status7 === 0
+        ? { id: 0, name: "Return", count: status7 }
+        : { ...data[6] };
 
     res.status(200).json({
       success: true,
