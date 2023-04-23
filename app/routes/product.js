@@ -18,7 +18,7 @@ router.get("/", getProductById);
 router.get("/all", getAllProducts);
 router.get("/seller/all", verifyToken, getAllProductsPaginationBySellerId);
 router.put("/seller/update", verifyToken, updateProduct);
-router.delete("/seller/delete", verifyToken, deleteProduct);
+router.delete("/seller/delete/:id", verifyToken, deleteProduct);
 router.get("/seller", verifyToken, getProductSellerById);
 
 module.exports = router;

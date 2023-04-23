@@ -225,12 +225,20 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   try {
-    const { id } = req.body;
-
+    const id = req.params.id;
+    console.log(id);
+    if (id === undefined)
+      res.status(400).json({
+        success: false,
+        message: "Deleted product failed!",
+      });
     const classifyArr = await classifies.getClasifyById(id);
-    const classifyPromises = classifyArr.map((classify) =>
-      classifies.deleteClassify(classify.cla_id)
-    );
+    let classifyPromises = [];
+    if (classifyArr.length > 0) {
+      classifyPromises = classifyArr.map((classify) =>
+        classifies.deleteClassify(classify.cla_id)
+      );
+    }
     const classifyResults = await Promise.allSettled(classifyPromises);
 
     const imagesArr = await images.getImagesByProductId(id);
