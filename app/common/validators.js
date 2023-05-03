@@ -9,7 +9,7 @@ exports.validateSignup = (data) => {
   // Validates the username.
   const isValidUsername = validator.matches(username, /^[a-zA-Z0-9]{5,30}$/);
   if (!isValidUsername) {
-    message = "Invalid username";
+    message = "Username must be at least 5 characters long";
   }
 
   // Validates the phone number
@@ -56,6 +56,20 @@ exports.validateLogin = (data) => {
     )
   ) {
     message = "Invalid phone number";
+  }
+
+  return {
+    message,
+    isValid: !message,
+  };
+};
+
+exports.validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  let message = "";
+
+  if (!emailRegex.test(email)) {
+    message = "Invalid email address";
   }
 
   return {

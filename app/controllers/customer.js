@@ -1,6 +1,10 @@
 /** @format */
 
-const { validateLogin, validateSignup } = require("../common/validators");
+const {
+  validateLogin,
+  validateSignup,
+  validateEmail,
+} = require("../common/validators");
 const Customer = require("../models/customer");
 const sha = require("sha1");
 const jwt = require("jsonwebtoken");
@@ -99,6 +103,12 @@ const signup = async (req, res) => {
 const updateInfoCustomer = async (req, res) => {
   const { id, username, email, gender, address } = req.body;
   try {
+    if (email) {
+      const { message, isValid } = validateEmail(email);
+      if (!isValid) {
+        return res.status(400).json({ success: false, message: message });
+      }
+    }
     const { avatar } = req.files ?? {};
     let linkAvatar = "";
     if (avatar) {
