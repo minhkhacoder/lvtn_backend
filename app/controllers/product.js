@@ -11,6 +11,7 @@ const Images = require("../models/images");
 const Product = require("../models/product");
 const Seller = require("../models/seller");
 const Producer = require("../models/producer");
+const { validateAddProduct } = require("../common/validators");
 const products = new Product();
 const classifies = new Classify();
 const images = new Images();
@@ -34,13 +35,10 @@ const createProduct = async (req, res) => {
       cla_group,
       cla_name,
     } = req.body;
-    let { pro_image } = req.files;
-
-    if (!pro_image) {
-      return res.status(400).json({
-        success: false,
-        message: "No image product file was uploaded.",
-      });
+    let pro_image = req.files?.pro_image;
+    const { message, isValid } = validateAddProduct(req.body, pro_image);
+    if (!isValid) {
+      return res.status(400).json({ success: false, message: message });
     }
 
     const imageProduct = await uploadAndGetMultiImage(
@@ -148,6 +146,11 @@ const updateProduct = async (req, res) => {
     } = req.body;
     const pro_image = req.files?.pro_image;
 
+    const { message, isValid } = validateAddProduct(req.body, pro_image);
+    if (!isValid) {
+      return res.status(400).json({ success: false, message: message });
+    }
+
     const existingProduct = await products.getProductById(id);
 
     if (!existingProduct) {
@@ -204,6 +207,21 @@ const updateProduct = async (req, res) => {
         return classifies.createClassify(classify);
       });
       flag = await Promise.all(classifyPromises);
+    }
+
+    if (pro_image) {
+      const imageProduct = await uploadAndGetMultiImage(
+        Array.isArray(pro_image) ? pro_image : [pro_image]
+      );
+
+      const imagePromises = imageProduct.map((image) =>
+        images.addImage({
+          img_url: image.url,
+          pro_id: id,
+          img_name: image.name,
+        })
+      );
+      flag = await Promise.all(imagePromises);
     }
 
     flag

@@ -35,7 +35,7 @@ const createProducer = async (req, res) => {
     await producer.createProducer(name);
     res.status(201).json({
       success: true,
-      message: "Producer brand successfully",
+      message: "Create producer successfully",
     });
   } catch (error) {
     res.status(400).json({

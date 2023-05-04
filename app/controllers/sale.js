@@ -1,4 +1,5 @@
 /** @format */
+const { validateSale } = require("../common/validators");
 const Sale = require("../models/sale");
 const SaleProduct = require("../models/sale_product");
 const sales = new Sale();
@@ -7,13 +8,11 @@ const saleProducts = new SaleProduct();
 const createSale = async (req, res) => {
   try {
     const { name, dateStart, dateEnd, pro_id, ps_value } = req.body;
-    console.log(pro_id);
-    if (pro_id.length === 0 || !ps_value) {
-      return res.status(400).json({
-        success: false,
-        message: "Created sale failed!",
-      });
+    const { message, isValid } = validateSale(req.body);
+    if (!isValid) {
+      return res.status(400).json({ success: false, message: message });
     }
+
     const resultSale = await sales.createSale(name, dateStart, dateEnd);
 
     if (!resultSale) {
@@ -39,11 +38,9 @@ const createSale = async (req, res) => {
     const flag = results.every((result) => result);
 
     const status = flag ? 201 : 400;
-    const message = flag
-      ? "Created sale successfully!"
-      : "Created sale failed!";
+    const mess = flag ? "Created sale successfully!" : "Created sale failed!";
 
-    res.status(status).json({ success: flag, message });
+    res.status(status).json({ success: flag, mess });
   } catch (error) {
     res.status(500).json({
       success: false,
